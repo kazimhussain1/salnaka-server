@@ -26,6 +26,17 @@ const userSchema = new mongoose.Schema(
             type: Number,
             required: true
           },
+          wallet: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Wallet",
+            required: true
+          },
+          package: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Package",
+            required: false,
+            default: false
+          },
           verified: {
             type: Boolean,
             required: false,
@@ -59,16 +70,7 @@ const userSchema = new mongoose.Schema(
                 default: false
               }
           },
-          package_id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Package",
-            required: true
-          },
-          wallet_id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Wallet",
-            required: true
-          },
+          
           
     }, {
       timestamps: true,
