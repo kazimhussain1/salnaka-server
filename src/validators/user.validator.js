@@ -1,4 +1,4 @@
-const { body, param } = require("express-validator");
+const { body, param, oneOf, check} = require("express-validator");
 const errorHandler = require("./errorHandler");
 
 module.exports = {
@@ -18,7 +18,7 @@ module.exports = {
     body("username")
       .exists()
       .withMessage("Username is required")
-      .matches(/^[a-z0-9_.]{3,16}$/)
+      .matches(/^[A-Za-z0-9_.]{3,16}$/)
       .withMessage("Please provide a valid username of length 3 to 16"),
 
     body("email")
@@ -45,9 +45,9 @@ module.exports = {
       .exists()
       .withMessage("Phone number is required")
       .matches(
-        /^\(?([0-9]{4})\)?[-]?([0-9]{3})[-]?([0-9]{4})$/
+        /^\(?([0-9]{4})\)?[-]{1}?([0-9]{3})[-]{1}?([0-9]{4})$/
       )
-      .withMessage("Phone number must be in this format XXXX-XXX-XXX"
+      .withMessage("Phone number must be in this format XXXX-XXX-XXXX"
       ),
       
 

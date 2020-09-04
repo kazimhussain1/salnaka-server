@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema(
             required: true
           },
           phone:{
-            type: Number,
+            type: String,
             required: true
           },
           wallet: {
@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Package",
             required: false,
-            default: false
+            default: null
           },
           verified: {
             type: Boolean,
@@ -46,7 +46,6 @@ const userSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref:"Media",
             required: false,
-            default: "NO PHOTO"
           },
           type:{
               seller:{

@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/server.js"
   },
   "repository": {
     "type": "git",
@@ -22,9 +23,15 @@
   "homepage": "https://gitlab.com/kazimhussain1/salnaka-server#readme",
   "dependencies": {
     "bcrypt": "^5.0.0",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "mongoose": "^5.10.0"
+    "express-validator": "^6.6.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.6.1",
+    "mongoose": "^5.10.0",
+    "multer": "^1.4.2",
+    "nodemon": "^2.0.4"
   }
 }

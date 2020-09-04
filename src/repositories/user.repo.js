@@ -7,6 +7,7 @@ const { TOKEN_EXPIRATION_TIME } = require("../config");
 
 module.exports = {
     async createUser(req, res) {
+      
         const {
             firstName,
             lastName,
@@ -58,7 +59,8 @@ module.exports = {
             }
 
             let new_wallet = new Wallet({current_amount: 0});
-           
+            
+            
             user = new User({
                 firstName,
                 lastName,
@@ -69,13 +71,16 @@ module.exports = {
                 wallet: new_wallet._id,
                 
             });
+            
 
             // Encrypt password
             const salt = await bcrypt.genSalt(10);
             user.password = await bcrypt.hash(password, salt);
 
             await user.save();
+          
             new_wallet.user = user._id;
+            
             await new_wallet.save();
 
             res.status(201).json({
@@ -96,7 +101,7 @@ module.exports = {
         }
     },
 
-    async loginUser(req, callback) {
+    async loginUser(req, res) {
         const {
             email,
             password
@@ -151,7 +156,9 @@ module.exports = {
                 (err, token) => {
                     if (err) {
                         console.error(err);
-                        return callback(err.toString(), null);
+                        return res.status(500).json({
+                            error: err.toString()
+                        });
                     }
 
                     const userObject = user.toObject();

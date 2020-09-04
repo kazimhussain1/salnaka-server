@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middleware/authentication");
 const userValidators = require("../validators/user.validator");
-const User = require("../models/User");
+const User = require("../models/User.model");
 const UserRepo = require("../repositories/user.repo");
 const multer = require("../middleware/multer");
 
@@ -15,14 +15,14 @@ const upload = multer.getMulterMiddleware(
 // @route   POST api/user/register
 // @desc    Register user
 // @access  Public
-router.post("/register", userValidators.validateRegistration, UserRepo.createUser);
+router.post("/register",userValidators.validateRegistration(),  UserRepo.createUser);
 
 
 
 // @route   POST api/user/login
 // @desc    Authenticate user & get token
 // @access  Public
-router.post("/login", userValidators.validateLogin, UserRepo.loginUser);
+router.post("/login", userValidators.validateLogin(), UserRepo.loginUser);
 
 router.use(authMiddleware);
 
