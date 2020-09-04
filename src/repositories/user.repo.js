@@ -1,11 +1,60 @@
 const User = require("../models/User.model");
 const Wallet = require('../models/Wallet.model');
+const Package = require('../models/Package.model');
 const bcrypt = require("bcryptjs");
+const referralCodeGenerator = require('referral-code-generator');
 
 const { sign } = require("jsonwebtoken");
 const { TOKEN_EXPIRATION_TIME } = require("../config");
 
 module.exports = {
+    async checkRefCode(req,res) {
+        const refCode = req.body.referralCode
+
+        try {
+            let user = await User.findOne({
+                $or: [{
+                        referralCode: refCode,
+                    },
+                ],
+            }).populate('profilePhotoUrl');
+
+            if(!user){
+                return res.status(401).json({
+                    errors: [{
+                        code: 404,
+                        message: "Referral code is invalid",
+                    }, ],
+
+                });
+
+            }
+            const userObject = user.toObject();
+            const success = {
+                firstName: userObject['firstName'],
+                lastName: userObject['lastName'],
+                userName: userObject['username'],
+                photo: userObject['profilePhotoUrl']
+            };
+
+            res.status(200).json({
+                success
+            });
+
+        }catch (err) {
+            console.error(err.message);
+            res.status(500).json({
+                errors: [{
+                    code: 500,
+                    message: err.toString(),
+                }, ],
+
+            });
+        }
+
+    },
+
+
     async createUser(req, res) {
       
         const {
@@ -58,8 +107,21 @@ module.exports = {
                 }
             }
 
-            let new_wallet = new Wallet({current_amount: 0});
+            let new_wallet = new Wallet({current_amount: 0}); 
             
+            let ref_code;
+            let is_ref_code = 12;
+            while(is_ref_code){
+                ref_code = referralCodeGenerator.alphaNumeric('uppercase',3,1);
+                is_ref_code = await User.findOne({
+                    $or: [{
+                            referralCode: ref_code,
+                        },
+                    ],
+                });
+
+            }
+             
             
             user = new User({
                 firstName,
@@ -69,6 +131,7 @@ module.exports = {
                 password,
                 phone,
                 wallet: new_wallet._id,
+                referralCode: ref_code
                 
             });
             
@@ -256,10 +319,57 @@ module.exports = {
         });
     },
 
+    async packageSelection(req,res) {
+        const {
+            _id,
+            package
+        } = req.body;
+        try{
+            let packages = await Package.findOne({
+                name: package
+            });
+            
+            let user = await User.findOneAndUpdate({
+                _id: _id
+            }, {
+                package: packages.id,
+                packageStatus: 'Pending'
+            }).populate('package');
+
+            if (!user) {
+                return res.status(400).json({
+                    errors: [{
+                        msg: "Invalid Credentials",
+                    }, ],
+                });
+            }
+
+            const userObject = user.toObject();
+            delete userObject["password"];
+
+            const success = {
+                message: "Status Pending. Waiting for approval of package from admin.",
+                user: userObject,
+            };
+
+            res.status(200).json({
+                success,
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({
+                errors: [
+                    err.toString()
+                ]
+            }, null);
+        }
+
+    },
+
     async changePassword(req, res) {
         const id = req.user.id;
 
-        let user = await User.findOneA({
+        let user = await User.findOne({
             _id: id,
         });
 

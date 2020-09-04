@@ -31,9 +31,18 @@ const userSchema = new mongoose.Schema(
             ref: "Wallet",
             required: true
           },
+          referralCode:{
+            type: String,
+            required: true
+          },
           package: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Package",
+            required: false,
+            default: null
+          },
+          packageStatus: {
+            type: String,
             required: false,
             default: null
           },
@@ -46,6 +55,7 @@ const userSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref:"Media",
             required: false,
+            default: null
           },
           type:{
               seller:{

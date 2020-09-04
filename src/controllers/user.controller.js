@@ -15,6 +15,7 @@ const upload = multer.getMulterMiddleware(
 // @route   POST api/user/register
 // @desc    Register user
 // @access  Public
+router.post("/checkrefcode",userValidators.validateReferralCode(), UserRepo.checkRefCode);
 router.post("/register",userValidators.validateRegistration(),  UserRepo.createUser);
 
 
@@ -27,6 +28,8 @@ router.post("/login", userValidators.validateLogin(), UserRepo.loginUser);
 router.use(authMiddleware);
 
 router.get("/", UserRepo.getProfile);
-router.put("/", upload, UserRepo.updateProfile);
+router.put("/", UserRepo.updateProfile);
+router.put("/packageSelection", UserRepo.packageSelection);
+// router.put("/", upload, UserRepo.updateProfile);
 router.post("/changePassword", userValidators.validateChangePassword, UserRepo.changePassword);
 module.exports = router;

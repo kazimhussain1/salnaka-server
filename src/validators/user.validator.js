@@ -2,6 +2,18 @@ const { body, param, oneOf, check} = require("express-validator");
 const errorHandler = require("./errorHandler");
 
 module.exports = {
+  validateReferralCode: () => [
+    oneOf([
+      check("referralCode")
+        .exists()
+        .withMessage("Referral code is required")
+        .matches(/^[A-Z0-9]{6}$/)
+        .withMessage("Please provide a valid referral code"),
+    ]),
+    
+
+    errorHandler,
+  ],
   validateRegistration: () => [
     body("firstName")
       .exists()
