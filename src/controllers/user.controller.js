@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middleware/authentication");
 const userValidators = require("../validators/user.validator");
-const User = require("../models/User.model");
 const UserRepo = require("../repositories/user.repo");
 const multer = require("../middleware/multer");
+const confirmationPost = require('../repositories/user.emailconfirmation.repo');
+const { resendToken } = require('../repositories/user.resendtoken.repo');
 
 const upload = multer.getMulterMiddleware(
     "profilePhoto",
@@ -17,6 +18,9 @@ const upload = multer.getMulterMiddleware(
 // @access  Public
 router.post("/checkrefcode",userValidators.validateReferralCode(), UserRepo.checkRefCode);
 router.post("/register",userValidators.validateRegistration(),  UserRepo.createUser);
+
+router.get('/confirmation/:token', confirmationPost.confirmationPost);
+router.post('/resend', userValidators.validateEmail(),resendToken);
 
 
 

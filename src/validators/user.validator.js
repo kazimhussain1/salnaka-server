@@ -68,7 +68,7 @@ module.exports = {
 
   validateLogin: () => [
     oneOf([
-      check("email")
+      check("username")
         .exists()
         .withMessage("Username is required")
         .matches(/^[a-z0-9_.]{3,16}$/)
@@ -113,6 +113,15 @@ module.exports = {
       .withMessage(
         "Password should contain at least one letter, one number and one special character"
       ),
+
+    errorHandler,
+  ],
+  validateEmail: () => [
+    body("email")
+      .exists()
+      .withMessage("Email is required")
+      .isEmail()
+      .withMessage("Please provide a valid email address"),
 
     errorHandler,
   ],

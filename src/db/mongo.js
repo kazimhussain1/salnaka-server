@@ -2,7 +2,12 @@ const mongoose = require("mongoose");
 
 
 mongoose
-  .connect("mongodb://localhost/salnaka_db", { useNewUrlParser: true , useUnifiedTopology: true, useFindAndModify:false})
+  .connect("mongodb://localhost/salnaka_db", 
+            { useNewUrlParser: true ,
+              useUnifiedTopology: true, 
+              useFindAndModify:false,
+              useCreateIndex: true
+          })
   .then(() => {
     console.log("connected to db");
   })

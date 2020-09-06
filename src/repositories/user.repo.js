@@ -1,7 +1,10 @@
 const User = require("../models/User.model");
 const Wallet = require('../models/Wallet.model');
 const Package = require('../models/Package.model');
+const EmailVerification = require('../models/EmailVerification.model');
 const bcrypt = require("bcryptjs");
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const referralCodeGenerator = require('referral-code-generator');
 
 const { sign } = require("jsonwebtoken");
@@ -146,6 +149,29 @@ module.exports = {
             
             await new_wallet.save();
 
+            // Verification Token
+            let emailVerificationToken = new EmailVerification({
+                _userId: user._id,
+                token: crypto.randomBytes(16).toString('hex')
+            });
+            await emailVerificationToken.save();
+            
+            var transporter = nodemailer.createTransport({ 
+                        service: 'gmail', 
+                        auth:{ 
+                                user: process.env.USERNAME_SENDMAIL, 
+                                pass: process.env.PASSWORD 
+                            } 
+                        });
+            var mailOptions = { 
+                from: 'no-reply@salnaka.com', 
+                to: user.email, 
+                subject: 'Account Verification Token', 
+                text: 'Hi ' + user.firstName +',\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/api' + '\/user'  + '\/confirmation\/' + emailVerificationToken.token + '.\n' 
+            };
+
+            await transporter.sendMail(mailOptions);
+          
             res.status(201).json({
                 success: {
                     message: "A verification link has been sent to your email. Please verify your account and sign in.",
@@ -204,6 +230,16 @@ module.exports = {
                 });
             }
 
+            if (!user.verified) {
+                return res.status(401).json({
+                    errors: [{
+                        code: 401,
+                        message: "Your account has not been verified.",
+                    }, ],
+
+                });
+            }
+            
             // Return jsonwebtoken
             const payload = {
                 user: {
@@ -349,6 +385,7 @@ module.exports = {
 
             const success = {
                 message: "Status Pending. Waiting for approval of package from admin.",
+                package: package,
                 user: userObject,
             };
 
