@@ -27,12 +27,6 @@ module.exports = {
       .matches(/^[a-z0-9_. A-Z]{1,16}$/)
       .withMessage("Please provide a valid lastName"),
 
-    body("username")
-      .exists()
-      .withMessage("Username is required")
-      .matches(/^[A-Za-z0-9_.]{3,16}$/)
-      .withMessage("Please provide a valid username of length 3 to 16"),
-
     body("email")
       .exists()
       .withMessage("Email is required")
@@ -55,32 +49,27 @@ module.exports = {
     
     body("phone")
       .exists()
-      .withMessage("Phone number is required")
-      .matches(
-        /^\(?([0-9]{4})\)?[-]{1}?([0-9]{3})[-]{1}?([0-9]{4})$/
-      )
-      .withMessage("Phone number must be in this format XXXX-XXX-XXXX"
-      ),
+      .withMessage("Phone number is required"),
+      // .matches(
+      //   /^\(?([0-9]{4})\)?[-]{1}?([0-9]{3})[-]{1}?([0-9]{4})$/
+      // )
+      // .withMessage("Phone number must be in this format XXXX-XXX-XXXX"
+      // ),
       
 
     errorHandler,
   ],
 
   validateLogin: () => [
-    oneOf([
-      check("username")
-        .exists()
-        .withMessage("Username is required")
-        .matches(/^[a-z0-9_.]{3,16}$/)
-        .withMessage("Please provide a avalid username"),
+    
 
-      check("email")
+      body("email")
         .exists()
         .withMessage("Email is required")
         .isEmail()
         .withMessage("Please provide a avalid email address"),
-    ]),
-    check("password", "Password is required").exists(),
+   
+    body("password", "Password is required").exists(),
 
     errorHandler,
   ],

@@ -1,69 +1,64 @@
 const User = require("../models/User.model");
-const Wallet = require('../models/Wallet.model');
-const Package = require('../models/Package.model');
-const EmailVerification = require('../models/EmailVerification.model');
+const Wallet = require("../models/Wallet.model");
+const Package = require("../models/Package.model");
+const EmailVerification = require("../models/EmailVerification.model");
 const bcrypt = require("bcryptjs");
-const crypto = require('crypto');
-const nodemailer = require('nodemailer');
-const referralCodeGenerator = require('referral-code-generator');
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
+const referralCodeGenerator = require("referral-code-generator");
 
-const { sign } = require("jsonwebtoken");
-const { TOKEN_EXPIRATION_TIME } = require("../config");
+const {
+    sign
+} = require("jsonwebtoken");
+const {
+    TOKEN_EXPIRATION_TIME
+} = require("../config");
 
 module.exports = {
-    async checkRefCode(req,res) {
-        const refCode = req.body.referralCode
+    async checkRefCode(req, res) {
+        const refCode = req.body.referralCode;
 
         try {
             let user = await User.findOne({
                 $or: [{
-                        referralCode: refCode,
-                    },
-                ],
-            }).populate('profilePhotoUrl');
+                    referralCode: refCode,
+                }, ],
+            }).populate("profilePhotoUrl");
 
-            if(!user){
+            if (!user) {
                 return res.status(401).json({
                     errors: [{
                         code: 404,
                         message: "Referral code is invalid",
                     }, ],
-
                 });
-
             }
             const userObject = user.toObject();
             const success = {
-                firstName: userObject['firstName'],
-                lastName: userObject['lastName'],
-                userName: userObject['username'],
-                photo: userObject['profilePhotoUrl']
+                firstName: userObject["firstName"],
+                lastName: userObject["lastName"],
+
+                photo: userObject["profilePhotoUrl"],
             };
 
             res.status(200).json({
-                success
+                success,
             });
-
-        }catch (err) {
+        } catch (err) {
             console.error(err.message);
             res.status(500).json({
                 errors: [{
                     code: 500,
                     message: err.toString(),
                 }, ],
-
             });
         }
-
     },
 
-
     async createUser(req, res) {
-      
         const {
             firstName,
             lastName,
-            username,
             email,
             password,
             phone,
@@ -72,112 +67,93 @@ module.exports = {
         try {
             // See if user exists
             let user = await User.findOne({
-                $or: [{
-                        username: username,
-                    },
-                    {
-                        email: email,
-                    },
-                ],
+                email: email,
             });
 
             if (user) {
-                if (user.username === username && user.email === email) {
 
-                    return res.status(409).json({
-                        errors: [{
-                            code: 409,
-                            message: "User already exists",
-                        }, ],
-                    });
-
-                } else if (user.username === username) {
-                    return res.status(409).json({
-                        errors: [{
-                            code: 409,
-                            message: "Username taken",
-                        }, ],
-                    })
-
-                } else {
-                    return res.status(409).json({
-                        errors: [{
-                            code: 409,
-                            message: "Email address taken",
-                        }, ],
-
-                    });
-                }
-            }
-
-            let new_wallet = new Wallet({current_amount: 0}); 
-            
-            let ref_code;
-            let is_ref_code = 12;
-            while(is_ref_code){
-                ref_code = referralCodeGenerator.alphaNumeric('uppercase',3,1);
-                is_ref_code = await User.findOne({
-                    $or: [{
-                            referralCode: ref_code,
-                        },
-                    ],
+                return res.status(409).json({
+                    errors: [{
+                        code: 409,
+                        message: "Email address taken",
+                    }, ],
                 });
 
             }
-             
-            
+
+            let new_wallet = new Wallet({
+                current_amount: 0
+            });
+
+            let ref_code;
+            let is_ref_code = 12;
+            while (is_ref_code) {
+                ref_code = referralCodeGenerator.alphaNumeric("uppercase", 3, 1);
+                is_ref_code = await User.findOne({
+                    $or: [{
+                        referralCode: ref_code,
+                    }, ],
+                });
+            }
+
             user = new User({
                 firstName,
                 lastName,
-                username,
+
                 email,
                 password,
                 phone,
                 wallet: new_wallet._id,
-                referralCode: ref_code
-                
+                referralCode: ref_code,
             });
-            
 
             // Encrypt password
             const salt = await bcrypt.genSalt(10);
             user.password = await bcrypt.hash(password, salt);
 
             await user.save();
-          
+
             new_wallet.user = user._id;
-            
+
             await new_wallet.save();
 
             // Verification Token
             let emailVerificationToken = new EmailVerification({
                 _userId: user._id,
-                token: crypto.randomBytes(16).toString('hex')
+                token: crypto.randomBytes(16).toString("hex"),
             });
             await emailVerificationToken.save();
-            
-            var transporter = nodemailer.createTransport({ 
-                        service: 'gmail', 
-                        auth:{ 
-                                user: process.env.USERNAME_SENDMAIL, 
-                                pass: process.env.PASSWORD 
-                            } 
-                        });
-            var mailOptions = { 
-                from: 'no-reply@salnaka.com', 
-                to: user.email, 
-                subject: 'Account Verification Token', 
-                text: 'Hi ' + user.firstName +',\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/api' + '\/user'  + '\/confirmation\/' + emailVerificationToken.token + '.\n' 
+
+            var transporter = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                    user: process.env.USERNAME_SENDMAIL,
+                    pass: process.env.PASSWORD,
+                },
+            });
+            var mailOptions = {
+                from: "no-reply@salnaka.com",
+                to: user.email,
+                subject: "Account Verification Token",
+                text: "Hi " +
+                    user.firstName +
+                    ",\n\n" +
+                    "Please verify your account by clicking the link: \nhttp://" +
+                    req.headers.host +
+                    "/api" +
+                    "/user" +
+                    "/confirmation/" +
+                    emailVerificationToken.token +
+                    ".\n",
             };
 
             await transporter.sendMail(mailOptions);
-          
+
             res.status(201).json({
                 success: {
                     message: "A verification link has been sent to your email. Please verify your account and sign in.",
                 },
             });
-
         } catch (err) {
             console.error(err.message);
             res.status(500).json({
@@ -185,7 +161,6 @@ module.exports = {
                     code: 500,
                     message: err.toString(),
                 }, ],
-
             });
         }
     },
@@ -199,14 +174,10 @@ module.exports = {
         try {
             // See if user exists
             const user = await User.findOne({
-                $or: [{
-                        username: email,
-                    },
-                    {
-                        email,
-                    },
-                ],
-            });
+                    email,
+                },
+
+            );
 
             if (!user) {
                 return res.status(401).json({
@@ -214,7 +185,6 @@ module.exports = {
                         code: 401,
                         message: "Invalid Credentials haha",
                     }, ],
-
                 });
             }
 
@@ -226,7 +196,6 @@ module.exports = {
                         code: 401,
                         message: "Invalid Credentials haha",
                     }, ],
-
                 });
             }
 
@@ -236,10 +205,9 @@ module.exports = {
                         code: 401,
                         message: "Your account has not been verified.",
                     }, ],
-
                 });
             }
-            
+
             // Return jsonwebtoken
             const payload = {
                 user: {
@@ -256,7 +224,7 @@ module.exports = {
                     if (err) {
                         console.error(err);
                         return res.status(500).json({
-                            error: err.toString()
+                            error: err.toString(),
                         });
                     }
 
@@ -270,17 +238,17 @@ module.exports = {
                     };
 
                     res.status(200).json({
-                        success
+                        success,
                     });
                 }
             );
         } catch (err) {
             console.error(err);
             res.status(500).json({
-                errors: [
-                    err.toString()
-                ]
-            }, null);
+                    errors: [err.toString()],
+                },
+                null
+            );
         }
     },
 
@@ -300,9 +268,8 @@ module.exports = {
         }
 
         user = User.populate([user], {
-            path:'workspace',
+            path: "workspace",
         });
-
 
         const userObject = user.toObject();
         delete userObject["password"];
@@ -322,14 +289,13 @@ module.exports = {
         const {
             firstName,
             lastName,
-            username
+           
         } = req.body;
 
         let updateQuery = {};
 
         if (firstName) updateQuery.firstName = firstName;
         if (lastName) updateQuery.lastName = lastName;
-        if (username) updateQuery.username = username;
         if (req.fileRelativeUrl) updateQuery.profilePhotoUrl = req.fileRelativeUrl;
 
         const user = await User.findOneAndUpdate({
@@ -355,22 +321,22 @@ module.exports = {
         });
     },
 
-    async packageSelection(req,res) {
+    async packageSelection(req, res) {
         const {
             _id,
             package
         } = req.body;
-        try{
+        try {
             let packages = await Package.findOne({
-                name: package
+                name: package,
             });
-            
+
             let user = await User.findOneAndUpdate({
-                _id: _id
+                _id: _id,
             }, {
                 package: packages.id,
-                packageStatus: 'Pending'
-            }).populate('package');
+                packageStatus: "Pending",
+            }).populate("package");
 
             if (!user) {
                 return res.status(400).json({
@@ -395,12 +361,11 @@ module.exports = {
         } catch (err) {
             console.error(err);
             res.status(500).json({
-                errors: [
-                    err.toString()
-                ]
-            }, null);
+                    errors: [err.toString()],
+                },
+                null
+            );
         }
-
     },
 
     async changePassword(req, res) {
@@ -437,6 +402,5 @@ module.exports = {
         res.status(200).json({
             success,
         });
-    }
-
+    },
 };
