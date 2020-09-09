@@ -2,33 +2,13 @@ const { body, param, oneOf, check} = require("express-validator");
 const errorHandler = require("./errorHandler");
 
 module.exports = {
-  validateReferralCode: () => [
-      check("referralCode")
-        .exists()
-        .withMessage("Referral code is required")
-        .matches(/^[A-Z0-9]{6}$/)
-        .withMessage("Please provide a valid referral code"),
+    validateRegistration: () => [
     
-    errorHandler,
-  ],
-  validateRegistration: () => [
-    body("firstName")
+    body("username")
       .exists()
-      .withMessage("firstName is required")
-      .matches(/^[a-z0-9_. A-Z]{1,16}$/)
-      .withMessage("Please provide a valid firstName"),
-
-    body("lastName")
-      .exists()
-      .withMessage("lastName is required")
-      .matches(/^[a-z0-9_. A-Z]{1,16}$/)
-      .withMessage("Please provide a valid lastName"),
-
-    body("email")
-      .exists()
-      .withMessage("Email is required")
-      .isEmail()
-      .withMessage("Please provide a valid email address"),
+      .withMessage("Username is required")
+      .matches(/^[A-Za-z0-9_.]{3,16}$/)
+      .withMessage("Please provide a valid username of length 3 to 16"),
 
     body("password")
       .exists()
@@ -44,29 +24,17 @@ module.exports = {
         "Password should contain at least one letter, one number and one special character"
       ),
     
-    body("phone")
-      .exists()
-      .withMessage("Phone number is required"),
-      // .matches(
-      //   /^\(?([0-9]{4})\)?[-]{1}?([0-9]{3})[-]{1}?([0-9]{4})$/
-      // )
-      // .withMessage("Phone number must be in this format XXXX-XXX-XXXX"
-      // ),
-      
-
     errorHandler,
   ],
 
   validateLogin: () => [
-    
-
-      body("email")
+    check("username")
         .exists()
-        .withMessage("Email is required")
-        .isEmail()
-        .withMessage("Please provide a avalid email address"),
-   
-    body("password", "Password is required").exists(),
+        .withMessage("Username is required")
+        .matches(/^[a-z0-9_.]{3,16}$/)
+        .withMessage("Please provide a avalid username"),
+
+    check("password", "Password is required").exists(),
 
     errorHandler,
   ],
@@ -102,13 +70,48 @@ module.exports = {
 
     errorHandler,
   ],
-  validateEmail: () => [
-    body("email")
-      .exists()
-      .withMessage("Email is required")
-      .isEmail()
-      .withMessage("Please provide a valid email address"),
 
+  validateUpdate: () => [
+    
+    body("userId")
+      .exists()
+      .withMessage("UserId is required"),
+    //   .matches(/^[a-z0-9_. A-Z]{1,16}$/)
+    //   .withMessage("Please provide a valid firstName"),
+
+    body("firstName")
+      .optional()
+      .matches(/^[a-z0-9_. A-Z]{1,16}$/)
+      .withMessage("Please provide a valid firstName"),
+
+    body("lastName")
+      .optional()
+      .matches(/^[a-z0-9_. A-Z]{1,16}$/)
+      .withMessage("Please provide a valid lastName"),
+
+    body("referralCode")
+      .optional()  
+      .matches(/^[A-Z0-9]{6}$/)
+      .withMessage("Please provide a valid referral code"),
+    
+    body("packageStatus")
+    .optional()
+    .matches(/Pending|Approved|Denied/)
+    .withMessage("Please provide a valid package status : pending or approved or denied "),
+
+    body("verified")
+    .optional()
+    .matches(/true/)
+    .withMessage("Verification can only be true."),
+
+
+
+    //referred from, phoneNo,
+    
+
+    
     errorHandler,
   ],
+
+  
 };

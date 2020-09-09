@@ -23,7 +23,7 @@ module.exports = {
                 $or: [{
                     referralCode: refCode,
                 }, ],
-            }).populate("profilePhotoUrl");
+            }).populate("profilePhoto");
 
             if (!user) {
                 return res.status(401).json({
@@ -38,7 +38,7 @@ module.exports = {
                 firstName: userObject["firstName"],
                 lastName: userObject["lastName"],
 
-                photo: userObject["profilePhotoUrl"],
+                photo: userObject["profilePhoto"],
             };
 
             res.status(200).json({
@@ -62,6 +62,7 @@ module.exports = {
             email,
             password,
             phone,
+            refCode
         } = req.body;
 
         try {
@@ -99,13 +100,22 @@ module.exports = {
             user = new User({
                 firstName,
                 lastName,
-
                 email,
                 password,
                 phone,
                 wallet: new_wallet._id,
                 referralCode: ref_code,
             });
+
+            if(refCode){
+                let userReferralFrom = await User.findOne({
+                    referralCode: refCode
+                });
+
+                if(userReferralFrom){
+                    user.referredFrom = userReferralFrom._id
+                }
+            }
 
             // Encrypt password
             const salt = await bcrypt.genSalt(10);
@@ -257,7 +267,8 @@ module.exports = {
 
         let user = await User.findOne({
             _id: id,
-        });
+        }).populate("package")
+        .populate("profilePhoto");
 
         if (!user) {
             return res.status(400).json({
@@ -266,10 +277,6 @@ module.exports = {
                 }, ],
             });
         }
-
-        user = User.populate([user], {
-            path: "workspace",
-        });
 
         const userObject = user.toObject();
         delete userObject["password"];
@@ -296,7 +303,7 @@ module.exports = {
 
         if (firstName) updateQuery.firstName = firstName;
         if (lastName) updateQuery.lastName = lastName;
-        if (req.fileRelativeUrl) updateQuery.profilePhotoUrl = req.fileRelativeUrl;
+        if (req.fileRelativeUrl) updateQuery.profilePhoto.url = req.fileRelativeUrl; //issue
 
         const user = await User.findOneAndUpdate({
                 _id: id,
@@ -307,7 +314,7 @@ module.exports = {
         );
 
         const userObject = user.toObject();
-        userObject.profilePhotoUrl =
+        userObject.profilePhoto.url =  //issue
             "http://" + req.header("host") + "/" + req.fileRelativeUrl;
         delete userObject["password"];
         delete userObject["__v"];

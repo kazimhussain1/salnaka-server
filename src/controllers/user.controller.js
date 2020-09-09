@@ -29,7 +29,7 @@ router.post('/resend', userValidators.validateEmail(),resendToken);
 // @access  Public
 router.post("/login", userValidators.validateLogin(), UserRepo.loginUser);
 
-router.use(authMiddleware);
+router.use(authMiddleware.userAuth);
 
 router.get("/", UserRepo.getProfile);
 router.put("/", UserRepo.updateProfile);

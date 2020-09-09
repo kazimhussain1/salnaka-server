@@ -31,6 +31,11 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true
           },
+          referredFrom:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true
+          },
           package: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Package",
@@ -47,7 +52,7 @@ const userSchema = new mongoose.Schema(
             required: false,
             default: false
           },
-          profilePhotoUrl: {
+          profilePhoto: {
             type: mongoose.Schema.Types.ObjectId,
             ref:"Media",
             required: false,
