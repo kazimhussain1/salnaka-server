@@ -101,7 +101,7 @@ module.exports = {
     body("packageStatus")
     .optional()
     .matches(/Pending|Approved|Denied/)
-    .withMessage("Please provide a valid package status : pending or approved or denied "),
+    .withMessage("Please provide a valid package status : Pending or Approved or Denied "),
 
     body("verified")
     .optional()
@@ -121,5 +121,49 @@ module.exports = {
     errorHandler,
   ],
 
+  createPackage: () => [
+    check("name")
+        .exists()
+        .withMessage("Package name is required")
+        .matches(/^[a-zA-Z0-9_.]{3,25}$/)
+        .withMessage("Please provide a valid package name")
+        .bail(),
+      
+      check("price")
+        .exists()
+        .withMessage("Price is required")
+        .matches(/^[0-9.]{1,25}$/)
+        .withMessage("Please provide valid price ")
+        .bail(),
+
+    errorHandler,
+  ],
+  deletePackage: () => [
+    check("packageId")
+        .exists()
+        .withMessage("packageId is required")
+        .matches(idRegex)
+        .withMessage("Please provide a valid package id"),
+
+
+    errorHandler,
+  ],
+
+  updatePackage: () => [
+    check("name")
+        .optional()
+        .matches(/^[a-z0-9_.]{3,25}$/)
+        .withMessage("Please provide a valid package name")
+        .bail(),
+      
+      check("price")
+        .optional()
+        .matches(/^[0-9.]{1,25}$/)
+        .withMessage("Please provide valid price ")
+        .bail(),
+
+
+    errorHandler,
+  ],
   
 };

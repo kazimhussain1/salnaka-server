@@ -4,6 +4,7 @@ const authMiddleware = require("../middleware/authentication");
 const adminValidators = require("../validators/admin.validators");
 const adminRepo = require("../repositories/admin.repo");
 const adminWalletRepo = require("../repositories/admin.wallet.repo");
+const adminPackageRepo = require("../repositories/admin.package.repo");
 // const {getMulterMiddleware, handleMulterError} = require("../middleware/multer");
 
 
@@ -31,8 +32,20 @@ router.delete("/user", adminRepo.deleteUser);
 router.get("/wallet", adminWalletRepo.getWallet);
 router.get("/wallet/:userId", adminWalletRepo.getTransactionHistory);
 
+// create package
+router.post("/package",adminValidators.createPackage() ,adminPackageRepo.createPackage);
+
+//delete package
+router.delete("/package",adminValidators.deletePackage() ,adminPackageRepo.deletePackage);
+
+//update package
+router.put("/package",adminValidators.updatePackage() ,adminPackageRepo.updatePackage);
+
+//get package
+router.get("/package",adminPackageRepo.getPackage);
+
 //add admin
-//router.post("/register",adminValidators.validateRegistration(), adminRepo.createAdmin)
+router.post("/register",adminValidators.validateRegistration(), adminRepo.createAdmin)
 
 //delete admin
 

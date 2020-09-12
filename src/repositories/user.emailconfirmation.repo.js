@@ -45,7 +45,8 @@ exports.confirmationPost = async (req, res) => {
     await user.save();
 
     res.status(200).json({
-      msg: "The account has been verified. Please log in.",
+      success: {msg: "The account has been verified. Please log in."}
+      ,
     });
   } catch (err) {
     console.error(err.message);

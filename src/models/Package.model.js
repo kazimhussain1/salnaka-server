@@ -6,8 +6,14 @@ const packageSchema = mongoose.Schema(
             type: String,
             required: true,
         },
-        description:{
-            type: String,
+        description:[
+            {
+                type: String,
+                required: true,
+            }
+        ],
+        profitRate:{
+            type: number,
             required: true,
         },
         price:{

@@ -7,6 +7,11 @@ const walletSchema = mongoose.Schema(
             ref: "User",
             required: true
         },
+        capital_amount:{
+            type: Number,
+            required: false,
+            default: 0
+        },
         current_amount:{
             type: Number,
             required: false,

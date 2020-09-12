@@ -190,7 +190,7 @@ module.exports = {
       }
 
       res.status(200).json({
-        users,
+        success: users,
       });
     } catch (err) {
       console.error(err.message);
@@ -208,7 +208,9 @@ module.exports = {
     try {
       const users = await User.find({
         packageStatus: "Pending",
-      }).select("-password");
+      })
+      .populate("package")
+      .select("-password");
 
       if (!users) {
         return res.status(400).json({
@@ -221,7 +223,7 @@ module.exports = {
       }
 
       res.status(200).json({
-        users,
+        success: users,
       });
     } catch (err) {
       console.error(err.message);
@@ -242,6 +244,7 @@ module.exports = {
         firstName,
         lastName,
         phone,
+        capitalAmount,
         referralCode,
         referredFrom,
         package,
@@ -270,7 +273,9 @@ module.exports = {
       if (firstName) updateQuery.firstName = firstName;
       if (lastName) updateQuery.lastName = lastName;
       if (phone) updateQuery.phone = phone;
-      if (packageStatus) updateQuery.packageStatus = packageStatus;
+      if (packageStatus){
+        updateQuery.packageStatus = packageStatus;
+      } 
 
       if (type) {
         const temp = {
@@ -364,6 +369,17 @@ module.exports = {
         }
       ).select("-password");
 
+      if(user.packageStatus === "Approved"){
+        if(capitalAmount){
+          await Wallet.findByIdAndUpdate({
+            _id: user.wallet
+          },
+          {
+            capital_amount: capitalAmount 
+          });
+        }
+      }
+
       const success = {
         user: user,
       };
@@ -386,7 +402,7 @@ module.exports = {
 
   async deleteUser(req, res) {
     try {
-      const id = req.body.id;
+      const id = req.body.userId;
 
       let user = await User.findById(id);
       if (!user) {
@@ -409,7 +425,7 @@ module.exports = {
       await User.findByIdAndDelete(id);
 
       res.status(200).json({
-        msg: "User with id " + id + " has been deleted",
+        success: {msg: "User with id " + id + " has been deleted"},
       });
     } catch (err) {
       console.error(err.message);

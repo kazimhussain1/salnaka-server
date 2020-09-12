@@ -5,20 +5,12 @@ const Transaction = require("../models/transaction.model");
 module.exports = {
   async getWallet(req, res) {
     try {
-      const wallets = await Wallet.find({});
+      const wallets = await Wallet.find({})
+      .populate("user");
 
-      if (!wallets) {
-        return res.status(400).json({
-          errors: [
-            {
-              msg: "No wallets found",
-            },
-          ],
-        });
-      }
-
+    
       res.status(200).json({
-        wallets,
+        success: wallets,
       });
     } catch (err) {
       console.error(err.message);
@@ -35,35 +27,25 @@ module.exports = {
 
   async getTransactionHistory(req, res) {
     try {
-      const id = req.params.userId;
+      const id = req.params.walletId;
 
-      let user = await User.findOne({
+      let wallet = await Wallet.findOne({
         _id: id,
-      }).select("-password");
+      });
 
-      if (!user) {
+      if (!wallet) {
         return res.status(400).json({
           errors: [
             {
-              msg: "Invalid Credentials",
+              msg: "Wallet not found",
             },
           ],
         });
       }
 
       let allTransactions = Transaction.find({
-        user_id: user.id,
+        wallet_id: wallet.id,
       });
-
-      if (!allTransactions) {
-        return res.status(400).json({
-          errors: [
-            {
-              msg: "No Transactions found",
-            },
-          ],
-        });
-      }
 
       const success = {
         transactions: allTransactions,
