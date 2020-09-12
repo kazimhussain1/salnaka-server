@@ -34,7 +34,8 @@ const userSchema = new mongoose.Schema(
           referredFrom:{
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true
+            required: false,
+            default: null,
           },
           package: {
             type: mongoose.Schema.Types.ObjectId,
