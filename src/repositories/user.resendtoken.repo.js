@@ -67,13 +67,3 @@ exports.resendToken = async (req, res) => {
         });
     }
 }
-
-
-// exports.resendTokenPost = function (req, res, next) {
-//     req.assert('email', 'Email is not valid').isEmail();
-//     req.assert('email', 'Email cannot be blank').notEmpty();
-//     req.sanitize('email').normalizeEmail({ remove_dots: false });
- 
-//     // Check for validation errors    
-//     var errors = req.validationErrors();
-//     if (errors) return res.status(400).send(errors);

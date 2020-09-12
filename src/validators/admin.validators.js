@@ -1,5 +1,9 @@
 const { body, param, oneOf, check} = require("express-validator");
 const errorHandler = require("./errorHandler");
+const config = require("../config");
+
+
+const idRegex = new RegExp(`^[0-9A-Fa-f]{${config.DB_ID_LENGTH}}$`);
 
 module.exports = {
     validateRegistration: () => [
@@ -75,9 +79,9 @@ module.exports = {
     
     body("userId")
       .exists()
-      .withMessage("UserId is required"),
-    //   .matches(/^[a-z0-9_. A-Z]{1,16}$/)
-    //   .withMessage("Please provide a valid firstName"),
+      .withMessage("UserId is required")
+      .matches(idRegex)
+      .withMessage("Please provide a valid user id"),
 
     body("firstName")
       .optional()
@@ -91,7 +95,7 @@ module.exports = {
 
     body("referralCode")
       .optional()  
-      .matches(/^[A-Z0-9]{6}$/)
+      .matches(/^[a-zA-Z0-9]{6}$/)
       .withMessage("Please provide a valid referral code"),
     
     body("packageStatus")
@@ -104,12 +108,16 @@ module.exports = {
     .matches(/true/)
     .withMessage("Verification can only be true."),
 
+    body("referredFrom")
+      .optional()
+      .matches(idRegex)
+      .withMessage("Please provide a valid user id for referredFrom"),
 
+    body("phone")
+      .optional()
+      .isNumeric()
+      .withMessage("Phone number is required"),
 
-    //referred from, phoneNo,
-    
-
-    
     errorHandler,
   ],
 

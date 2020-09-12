@@ -6,7 +6,7 @@ module.exports = {
       check("referralCode")
         .exists()
         .withMessage("Referral code is required")
-        .matches(/^[A-Z0-9]{6}$/)
+        .matches(/^[a-zA-Z0-9]{6}$/)
         .withMessage("Please provide a valid referral code"),
     
     errorHandler,
@@ -46,6 +46,7 @@ module.exports = {
     
     body("phone")
       .exists()
+      .isNumeric()
       .withMessage("Phone number is required"),
       // .matches(
       //   /^\(?([0-9]{4})\)?[-]{1}?([0-9]{3})[-]{1}?([0-9]{4})$/
@@ -58,8 +59,7 @@ module.exports = {
   ],
 
   validateLogin: () => [
-    
-
+  
       body("email")
         .exists()
         .withMessage("Email is required")
@@ -111,4 +111,25 @@ module.exports = {
 
     errorHandler,
   ],
+
+  validateUpdate: () => [
+    
+    body("firstName")
+      .optional()
+      .matches(/^[a-z0-9_. A-Z]{1,16}$/)
+      .withMessage("Please provide a valid firstName"),
+
+    body("lastName")
+      .optional()
+      .matches(/^[a-z0-9_. A-Z]{1,16}$/)
+      .withMessage("Please provide a valid lastName"),
+    
+    body("phone")
+    .optional()
+    .isNumeric()
+    .withMessage("Phone number is required"),
+    
+    errorHandler,
+  ],
+
 };

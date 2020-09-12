@@ -13,6 +13,7 @@ const {
 const {
     TOKEN_EXPIRATION_TIME
 } = require("../config");
+const { findOneAndUpdate } = require("../models/User.model");
 
 module.exports = {
     async checkRefCode(req, res) {
@@ -193,7 +194,7 @@ module.exports = {
                 return res.status(401).json({
                     errors: [{
                         code: 401,
-                        message: "Invalid Credentials haha",
+                        message: "Invalid Credentials",
                     }, ],
                 });
             }
@@ -204,7 +205,7 @@ module.exports = {
                 return res.status(401).json({
                     errors: [{
                         code: 401,
-                        message: "Invalid Credentials haha",
+                        message: "Invalid Credentials",
                     }, ],
                 });
             }
@@ -263,69 +264,95 @@ module.exports = {
     },
 
     async getProfile(req, res) {
-        const id = req.user.id;
+        try{
+            const id = req.user.id;
 
-        let user = await User.findOne({
-            _id: id,
-        }).populate("package")
-        .populate("profilePhoto");
+            let user = await User.findOne({
+                _id: id,
+            }).populate("package")
+            // .populate("profilePhoto");
 
-        if (!user) {
-            return res.status(400).json({
+            if (!user) {
+                return res.status(400).json({
+                    errors: [{
+                        msg: "Invalid Credentials",
+                    }, ],
+                });
+            }
+
+            const userObject = user.toObject();
+            delete userObject["password"];
+
+            const success = {
+                user: userObject,
+            };
+
+            res.status(200).json({
+                success,
+            });
+        } catch (err) {
+            console.error(err.message);
+            res.status(500).json({
                 errors: [{
-                    msg: "Invalid Credentials haha",
+                    code: 500,
+                    message: err.toString(),
                 }, ],
             });
-        }
-
-        const userObject = user.toObject();
-        delete userObject["password"];
-
-        const success = {
-            user: userObject,
-        };
-
-        res.status(200).json({
-            success,
-        });
+    }
     },
 
     async updateProfile(req, res) {
-        const id = req.user.id;
+        try{
+            const id = req.user.id;
 
-        const {
-            firstName,
-            lastName,
-           
-        } = req.body;
+            const {
+                firstName,
+                lastName,
+                phone,
+                type
+            } = req.body;
 
-        let updateQuery = {};
+            let updateQuery = {};
 
-        if (firstName) updateQuery.firstName = firstName;
-        if (lastName) updateQuery.lastName = lastName;
-        if (req.fileRelativeUrl) updateQuery.profilePhoto.url = req.fileRelativeUrl; //issue
+            if (firstName) updateQuery.firstName = firstName;
+            if (lastName) updateQuery.lastName = lastName;
+            if (phone) updateQuery.phone = phone;
+            if (type) {
+                const temp = {
+                    seller: type.seller,
+                    ad_publisher: type.ad_publisher,
+                    earner: type.earner,
+                    buyer: type.buyer
 
-        const user = await User.findOneAndUpdate({
-                _id: id,
-            },
-            updateQuery, {
-                new: true,
+                }
+                updateQuery.type = temp;
             }
-        );
+             // if (req.fileRelativeUrl) updateQuery.profilePhoto.url = req.fileRelativeUrl; //issue
+            
+            const user = await User.findOneAndUpdate({
+                    _id: id,
+                },
+                updateQuery, {
+                    new: true,
+                }
+            ).select("-password");
 
-        const userObject = user.toObject();
-        userObject.profilePhoto.url =  //issue
-            "http://" + req.header("host") + "/" + req.fileRelativeUrl;
-        delete userObject["password"];
-        delete userObject["__v"];
+            const success = {
+                user: user,
+            };
 
-        const success = {
-            user: userObject,
-        };
-
-        res.status(200).json({
-            success,
-        });
+            res.status(200).json({
+                success,
+            });
+        } catch (err) {
+            console.error(err.message);
+            res.status(500).json({
+                errors: [{
+                    code: 500,
+                    message: err.toString(),
+                }, ],
+            });
+        }
     },
 
     async packageSelection(req, res) {
@@ -378,25 +405,48 @@ module.exports = {
     async changePassword(req, res) {
         const id = req.user.id;
 
+        let {
+            currentPassword,
+            newPassword
+        } = req.body;
+        console.log(currentPassword,newPassword)
         let user = await User.findOne({
             _id: id,
-        });
-
-        user = await User.findOneAndUpdate({
-            _id: id,
-        }, {
-            password,
-        }, {
-            new: true,
         });
 
         if (!user) {
             return res.status(400).json({
                 errors: [{
-                    msg: "Invalid Credentials haha",
+                    msg: "Invalid Credentials",
                 }, ],
             });
         }
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+        if (!isMatch) {
+            return res.status(401).json({
+                errors: [{
+                    code: 401,
+                    message: "Invalid Credentials",
+                }, ],
+            });
+        }
+
+        
+        const salt = await bcrypt.genSalt(10);
+        newPassword = await bcrypt.hash(newPassword, salt);
+
+
+        user = await User.findOneAndUpdate({
+            _id: id,
+        }, {
+            password:newPassword,
+        }, {
+            new: true,
+        });
+
+        
 
         const userObject = user.toObject();
         delete userObject["password"];

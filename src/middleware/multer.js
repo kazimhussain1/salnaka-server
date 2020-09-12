@@ -13,7 +13,9 @@ function getMulterMiddleware(
   allowVideo,
   numberOfFiles = 1
 ) {
-  return (req, res, next) => {
+  return async (req, res, next) => {
+    // console.log(req.fields.userId, req.admin.id)
+
     const storage = multer.diskStorage({
       destination: destinationPath,
       filename: (req, file, cb) => {
@@ -23,7 +25,7 @@ function getMulterMiddleware(
             "img_" +
             new Date().toISOString().replace(/:/g, "-") +
             "_" +
-            req.user.id +
+            req.user==undefined ? req.user.id : req.body.userId +
             "." +
             fileType[1];
           cb(null, fileName);
@@ -81,18 +83,21 @@ function getMulterMiddleware(
     } else {
       multerHandler = multerHandler.array(fieldName, numberOfFiles);
     }
-
-    multerHandler(req, res, (error) => {
-      req.multerError = {
-        errorCode: 400,
-        error: error.toString(),
-      };
-
-      res.status(400).send({
-        errorCode: 400,
-        error: error.toString(),
-      });
-    });
+   multerHandler(req,res,next);
+    // multerHandler(req, res, (error) => {
+    //   console.log('here in multer error', error)
+    //   if(error){
+    //     req.multerError = {
+    //       errorCode: 400,
+    //       error: error.toString(),
+    //     };
+      
+    //   res.status(400).send({
+    //     errorCode: 400,
+    //     error: error.toString(),
+    //   });
+    // }
+    // });
   };
 }
 

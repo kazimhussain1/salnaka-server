@@ -8,7 +8,7 @@ const bcrypt = require("bcryptjs");
 
 const { sign } = require("jsonwebtoken");
 const { TOKEN_EXPIRATION_TIME } = require("../config");
-const { findOne } = require("../models/User.model");
+const { findOne, update } = require("../models/User.model");
 
 
 module.exports = {
@@ -247,7 +247,6 @@ module.exports = {
                 referredFrom,
                 package,
                 packageStatus,
-                profilePhoto,
                 type,
                 verified
             
@@ -284,13 +283,6 @@ module.exports = {
                 updateQuery.type = temp;} 
             if (verified) updateQuery.verified = verified;
             
-            user = await User.findOneAndUpdate({
-                    _id: userId,
-                },
-                updateQuery, {
-                    new: true,
-                }
-            ).select("-password");
             
             if (referralCode) {
                 const checkRefCode = await findOne({
@@ -304,8 +296,9 @@ module.exports = {
                         }, ],
                     });
                 }
-                user.referralCode = referralCode;
-                await user.save();
+                // user.referralCode = referralCode;
+                updateQuery.referralCode = referralCode
+                // await user.save();
             }
 
             if (referredFrom) {
@@ -320,8 +313,9 @@ module.exports = {
                         }, ],
                     });
                 }
-                user.referredFrom = referredFrom;
-                await user.save();
+                updateQuery.referredFrom = referredFrom;
+                // user.referredFrom = referredFrom;
+                // await user.save();
             } 
 
             if(package){
@@ -337,15 +331,18 @@ module.exports = {
                         }, ],
                     });
                 }
-
-                user.package = checkPackage._id
-                user.save(); 
-
-            }
-
-            if(profilePhoto){
+                updateQuery.package = checkPackage._id
+                // user.package = checkPackage._id
+                // user.save(); 
 
             }
+            
+            // if(req.file){
+            //     // const newMedia = new Media({
+            //         console.log(req.file, userId)
+
+            //     // });
+            // }
             // if (req.fileRelativeUrl) updateQuery.profilePhotoUrl = req.fileRelativeUrl;
 
             // const userObject = user.toObject();
@@ -353,6 +350,14 @@ module.exports = {
             //     "http://" + req.header("host") + "/" + req.fileRelativeUrl;
             // delete userObject["password"];
             // delete userObject["__v"];
+            user = await User.findOneAndUpdate({
+                    _id: userId,
+                },
+                updateQuery, {
+                    new: true,
+                }
+            ).select("-password");
+        
 
             const success = {
                 user: user,

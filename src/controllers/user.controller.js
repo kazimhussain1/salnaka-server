@@ -3,15 +3,16 @@ const router = express.Router();
 const authMiddleware = require("../middleware/authentication");
 const userValidators = require("../validators/user.validator");
 const UserRepo = require("../repositories/user.repo");
-const multer = require("../middleware/multer");
+const UserWalletRepo = require("../repositories/user.wallet.repo");
+//const multer = require("../middleware/multer");
 const confirmationPost = require('../repositories/user.emailconfirmation.repo');
 const { resendToken } = require('../repositories/user.resendtoken.repo');
 
-const upload = multer.getMulterMiddleware(
-    "profilePhoto",
-    "public/media/",
-    false
-);
+// const upload = multer.getMulterMiddleware(
+//     "profilePhoto",
+//     "public/media/",
+//     false
+// );
 
 // @route   POST api/user/register
 // @desc    Register user
@@ -32,8 +33,14 @@ router.post("/login", userValidators.validateLogin(), UserRepo.loginUser);
 router.use(authMiddleware.userAuth);
 
 router.get("/", UserRepo.getProfile);
-router.put("/", UserRepo.updateProfile);
+router.get("/wallet", UserWalletRepo.getWallet);
+router.get("/transactionHistory", UserWalletRepo.getTransactionHistory);
+
+
+router.put("/",userValidators.validateUpdate() ,UserRepo.updateProfile);
 router.put("/packageSelection", UserRepo.packageSelection);
 // router.put("/", upload, UserRepo.updateProfile);
-router.post("/changePassword", userValidators.validateChangePassword, UserRepo.changePassword);
+
+router.post("/changePassword", userValidators.validateChangePassword(), UserRepo.changePassword);
+
 module.exports = router;
