@@ -13,7 +13,7 @@ const packageSchema = mongoose.Schema(
             }
         ],
         profitRate:{
-            type: number,
+            type: Number,
             required: true,
         },
         price:{
