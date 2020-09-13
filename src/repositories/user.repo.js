@@ -273,8 +273,8 @@ module.exports = {
 
       let user = await User.findOne({
         _id: id,
-      }).populate("package");
-      // .populate("profilePhoto");
+      }).populate("package")
+      .populate("wallet");
 
       if (!user) {
         return res.status(400).json({

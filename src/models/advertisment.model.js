@@ -1,4 +1,4 @@
-2const mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
 const adsSchema = mongoose.Schema(
     {
