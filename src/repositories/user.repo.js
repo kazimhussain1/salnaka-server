@@ -380,7 +380,7 @@ module.exports = {
 
       let user = await User.findOneAndUpdate(
         {
-          _id: _id,
+          _id: req.user.id,
         },
         {
           package: packages.id,
