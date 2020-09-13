@@ -48,6 +48,16 @@ const userSchema = new mongoose.Schema(
             required: false,
             default: null
           },
+          orderDate:{
+            type: Date,
+            required: false,
+            default: null
+          },
+          approvalDate:{
+            type: Date,
+            required: false,
+            default: null
+          },
           verified: {
             type: Boolean,
             required: false,

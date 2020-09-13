@@ -31,6 +31,12 @@ const errorConstants = {
     },
 }
 
+const transactionConstants = {
+    INCOMING : "Incoming",
+    OUTGOING : "Outgoing"
+}
+
 module.exports = {
-    errorConstants
+    errorConstants,
+    transactionConstants
 }

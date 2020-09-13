@@ -63,7 +63,7 @@ module.exports = {
         });
       }
 
-      let allTransactions = Transaction.find({
+      let allTransactions = await Transaction.find({
         user_id: user.id,
       });
 

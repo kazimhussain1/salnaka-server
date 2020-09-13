@@ -79,7 +79,7 @@ module.exports = {
       }
 
       let new_wallet = new Wallet({
-        current_amount: 0,
+        currentAmount: 0,
       });
 
       let ref_code;
@@ -368,6 +368,16 @@ module.exports = {
         name: package,
       });
 
+      if (!packages) {
+        return res.status(400).json({
+          errors: [
+            {
+              msg: "Package " + package + " not found",
+            },
+          ],
+        });
+      }
+
       let user = await User.findOneAndUpdate(
         {
           _id: _id,
@@ -375,6 +385,7 @@ module.exports = {
         {
           package: packages.id,
           packageStatus: "Pending",
+          orderDate: new Date(),
         }
       ).populate("package");
 

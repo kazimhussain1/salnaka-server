@@ -209,8 +209,8 @@ module.exports = {
       const users = await User.find({
         packageStatus: "Pending",
       })
-      .populate("package")
-      .select("-password");
+        .populate("package")
+        .select("-password");
 
       if (!users) {
         return res.status(400).json({
@@ -273,9 +273,12 @@ module.exports = {
       if (firstName) updateQuery.firstName = firstName;
       if (lastName) updateQuery.lastName = lastName;
       if (phone) updateQuery.phone = phone;
-      if (packageStatus){
+      if (packageStatus) {
         updateQuery.packageStatus = packageStatus;
-      } 
+        if (packageStatus === "Approved") {
+          updateQuery.approvalDate = new Date();
+        }
+      }
 
       if (type) {
         const temp = {
@@ -342,8 +345,6 @@ module.exports = {
           });
         }
         updateQuery.package = checkPackage._id;
-        // user.package = checkPackage._id
-        // user.save();
       }
 
       // if(req.file){
@@ -369,14 +370,16 @@ module.exports = {
         }
       ).select("-password");
 
-      if(user.packageStatus === "Approved"){
-        if(capitalAmount){
-          await Wallet.findByIdAndUpdate({
-            _id: user.wallet
-          },
-          {
-            capital_amount: capitalAmount 
-          });
+      if (user.packageStatus === "Approved") {
+        if (capitalAmount) {
+          await Wallet.findByIdAndUpdate(
+            {
+              _id: user.wallet,
+            },
+            {
+              capitalAmount: capitalAmount,
+            }
+          );
         }
       }
 
@@ -425,7 +428,7 @@ module.exports = {
       await User.findByIdAndDelete(id);
 
       res.status(200).json({
-        success: {msg: "User with id " + id + " has been deleted"},
+        success: { msg: "User with id " + id + " has been deleted" },
       });
     } catch (err) {
       console.error(err.message);

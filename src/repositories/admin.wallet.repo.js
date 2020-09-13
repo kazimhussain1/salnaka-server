@@ -43,7 +43,7 @@ module.exports = {
         });
       }
 
-      let allTransactions = Transaction.find({
+      let allTransactions = await Transaction.find({
         wallet_id: wallet.id,
       });
 
@@ -66,4 +66,30 @@ module.exports = {
       });
     }
   },
+  
+  async getAllTransactionHistory(req, res) {
+    try {
+      
+      let allTransactions = await Transaction.find({});
+
+      const success = {
+        transactions: allTransactions,
+      };
+
+      res.status(200).json({
+        success,
+      });
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).json({
+        errors: [
+          {
+            code: 500,
+            msg: err.toString(),
+          },
+        ],
+      });
+    }
+  },
+
 };

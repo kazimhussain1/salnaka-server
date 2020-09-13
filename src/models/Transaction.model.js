@@ -18,10 +18,10 @@ const transaction_historySchema = mongoose.Schema(
         },
         date:{
             type: Date,
-            default: true
+            required: true
         },
        
-        action:{ //whether recieved or sent
+        action:{ //whether incoming or outgoing
             type: String,
             required: true,
         },

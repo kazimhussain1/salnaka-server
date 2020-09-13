@@ -13,7 +13,7 @@ router.post("/login", adminValidators.validateLogin(), adminRepo.loginAdmin);
 router.use(authMiddleware.adminAuth);
 
 //get user
-router.get("/User/:userId", adminRepo.getUser);
+router.get("/User/:userId", adminValidators.getUser() ,adminRepo.getUser);
 
 //get users
 router.get("/Users", adminRepo.getUsers);
@@ -30,7 +30,8 @@ router.delete("/user", adminRepo.deleteUser);
 
 //get wallet
 router.get("/wallet", adminWalletRepo.getWallet);
-router.get("/wallet/:userId", adminWalletRepo.getTransactionHistory);
+router.get("/wallet/:walletId", adminValidators.getTransactionHistory() ,adminWalletRepo.getTransactionHistory);
+router.get("/transactionHistory", adminWalletRepo.getAllTransactionHistory);
 
 // create package
 router.post("/package",adminValidators.createPackage() ,adminPackageRepo.createPackage);

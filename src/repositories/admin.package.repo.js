@@ -8,6 +8,7 @@ module.exports = {
         const {
             name,
             description,
+            profitRate,
             price
         } = req.body;
       
@@ -28,6 +29,7 @@ module.exports = {
         package = new Package({
             name,
             description,
+            profitRate,
             price
         });
 
@@ -94,6 +96,7 @@ module.exports = {
             id,
             name,
             description,
+            profitRate,
             price
         } = req.body;
 
@@ -113,6 +116,7 @@ module.exports = {
 
         if (name) updateQuery.name = name;
         if (description) updateQuery.description = description;
+        if (profitRate) updateQuery.profitRate = profitRate;
         if (price) updateQuery.price = price;
         
         package = await Package.findOneAndUpdate(

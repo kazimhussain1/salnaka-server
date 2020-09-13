@@ -136,6 +136,13 @@ module.exports = {
         .withMessage("Please provide valid price ")
         .bail(),
 
+      check("profitRate")
+        .exists()
+        .withMessage("rate is required")
+        .matches(/^[0-9.]{1,25}$/)
+        .withMessage("Please provide valid rate ")
+        .bail(),
+
     errorHandler,
   ],
   deletePackage: () => [
@@ -144,6 +151,26 @@ module.exports = {
         .withMessage("packageId is required")
         .matches(idRegex)
         .withMessage("Please provide a valid package id"),
+
+
+    errorHandler,
+  ],
+  getUser: () => [
+    param("userId")
+        .exists()
+        .withMessage("userId is required")
+        .matches(idRegex)
+        .withMessage("Please provide a valid user id"),
+
+
+    errorHandler,
+  ],
+  getTransactionHistory: () => [
+    param("walletId")
+        .exists()
+        .withMessage("walletId is required")
+        .matches(idRegex)
+        .withMessage("Please provide a valid wallet id"),
 
 
     errorHandler,
@@ -160,6 +187,12 @@ module.exports = {
         .optional()
         .matches(/^[0-9.]{1,25}$/)
         .withMessage("Please provide valid price ")
+        .bail(),
+      
+      check("profitRate")
+        .optional()
+        .matches(/^[0-9.]{1,25}$/)
+        .withMessage("Please provide valid rate ")
         .bail(),
 
 

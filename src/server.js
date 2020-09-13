@@ -6,7 +6,9 @@ const db = require("./db/mongo");
 const api = require("./routes");
 const { join } = require("path");
 const cors = require('cors')
+const cronJob = require('cron').CronJob;
 const expressFormidable = require("express-formidable");
+const profit = require("./repositories/transaction.repo");
 
 const PORT = process.env.PORT || 3000;
 
@@ -21,5 +23,8 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(cors())
 app.use("/", express.static(join(__dirname, "../", "public/")));
 app.use("/api", api);
+
+let profitJob = new cronJob('0 0 17 * * *', () => profit.profit());
+profitJob.start();
 
 server.listen(PORT, () => console.log(`server running on port ${PORT}`));
