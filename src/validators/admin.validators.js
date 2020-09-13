@@ -132,7 +132,7 @@ module.exports = {
       check("price")
         .exists()
         .withMessage("Price is required")
-        .matches(/^[0-9.]{1,25}$/)
+        .matches(/^[0-9., -]{1,25}$/)
         .withMessage("Please provide valid price ")
         .bail(),
 
@@ -185,7 +185,7 @@ module.exports = {
       
       check("price")
         .optional()
-        .matches(/^[0-9.]{1,25}$/)
+        .matches(/^[0-9., -]{1,25}$/)
         .withMessage("Please provide valid price ")
         .bail(),
       

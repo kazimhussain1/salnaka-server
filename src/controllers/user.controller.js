@@ -38,6 +38,7 @@ router.get("/transactionHistory", UserWalletRepo.getTransactionHistory);
 
 
 router.put("/",userValidators.validateUpdate() ,UserRepo.updateProfile);
+router.get("/packages", UserRepo.getPackage);
 router.put("/packageSelection", UserRepo.packageSelection);
 // router.put("/", upload, UserRepo.updateProfile);
 
