@@ -31,7 +31,7 @@ module.exports = {
 
       let wallet = await Wallet.findOne({
         _id: id,
-      });
+      }).populate('user');
 
       if (!wallet) {
         return res.status(400).json({
@@ -48,6 +48,7 @@ module.exports = {
       });
 
       const success = {
+        wallet,
         transactions: allTransactions,
       };
 

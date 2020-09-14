@@ -24,6 +24,7 @@ app.use(cors())
 app.use("/", express.static(join(__dirname, "../", "public/")));
 app.use("/api", api);
 
+// profit.profit()
 let profitJob = new cronJob('0 0 17 * * *', () => profit.profit());
 profitJob.start();
 
