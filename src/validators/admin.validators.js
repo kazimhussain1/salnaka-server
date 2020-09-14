@@ -35,7 +35,7 @@ module.exports = {
     check("username")
         .exists()
         .withMessage("Username is required")
-        .matches(/^[a-z0-9_.]{3,16}$/)
+        .matches(/^[a-z0-9_.]{3,25}$/)
         .withMessage("Please provide a avalid username"),
 
     check("password", "Password is required").exists(),
