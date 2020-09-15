@@ -4,59 +4,64 @@ const Package = require("../models/package.model");
 module.exports = {
   async createPackage(req, res) {
     try {
-        
-        const {
-            name,
-            description,
-            profitRate,
-            price
-        } = req.body;
-      
-        let package = await Package.findOne({
-            name: name
-        });
+      const {
+        name,
+        description,
+        profitRangeStart,
+        profitRangeEnd,
+        profitRate,
+        price,
+      } = req.body;
 
-        if (package) {
-            return res.status(400).json({
-                errors: [
-                    {
-                    msg: "Package with name " + name + " already exists",
-                    },
-                ],
-            });
-        }
+      let package = await Package.findOne({
+        name: name,
+      });
 
-        package = new Package({
-            name,
-            description,
-            profitRate,
-            price
+      if (package) {
+        return res.status(400).json({
+          errors: [
+            {
+              msg: "Package with name " + name + " already exists",
+            },
+          ],
         });
+      }
 
-        await package.save();
+      package = new Package({
+        name,
+        description,
+        profitRange: {
+          start: profitRangeStart,
+          end: profitRangeEnd,
+        },
+        profitRate,
+        price,
+      });
 
-        res.status(200).json({
-            success : package,
-        });
-        } catch (err) {
-        console.error(err.message);
-        res.status(500).json({
-            errors: [
-                {
-                    code: 500,
-                    msg: err.toString(),
-                },
-            ],
-        });
+      await package.save();
+
+      res.status(200).json({
+        success: package,
+      });
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).json({
+        errors: [
+          {
+            code: 500,
+            msg: err.toString(),
+          },
+        ],
+      });
     }
   },
 
   async deletePackage(req, res) {
     try {
-        const id = req.body.packageId;
+      const id = req.body.packageId;
 
-        let package = await Package.findOne({
-            _id: id
+      let package = await Package.findOne({
+        _id: id,
       });
 
       if (!package) {
@@ -70,21 +75,21 @@ module.exports = {
       }
 
       await Package.findByIdAndDelete(id);
-        const success = {
-            msg: "Package with id " + id + " has been deleted"
-        };
+      const success = {
+        msg: "Package with id " + id + " has been deleted",
+      };
 
-        res.status(200).json({
-            success,
-        });
+      res.status(200).json({
+        success,
+      });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({
-            errors: [
-            {
-                code: 500,
-                msg: err.toString(),
-            },
+      console.error(err.message);
+      res.status(500).json({
+        errors: [
+          {
+            code: 500,
+            msg: err.toString(),
+          },
         ],
       });
     }
@@ -92,60 +97,68 @@ module.exports = {
 
   async updatePackage(req, res) {
     try {
-        const {
-            id,
-            name,
-            description,
-            profitRate,
-            price
-        } = req.body;
+      const {
+        id,
+        name,
+        description,
+        profitRangeStart,
+        profitRangeEnd,
+        profitRate,
+        price,
+      } = req.body;
 
-        let package = Package.findById(id);
+      let package = Package.findById(id);
 
-        if (!package) {
-            return res.status(400).json({
-              errors: [
-                {
-                  msg: "Package donot exists.",
-                },
-              ],
-            });
-          }
-
-        let updateQuery = {};
-
-        if (name) updateQuery.name = name;
-        if (description) updateQuery.description = description;
-        if (profitRate) updateQuery.profitRate = profitRate;
-        if (price) updateQuery.price = price;
-        
-        package = await Package.findOneAndUpdate(
+      if (!package) {
+        return res.status(400).json({
+          errors: [
             {
-              _id: id,
+              msg: "Package donot exists.",
             },
-            updateQuery,
-            {
-              new: true,
-            }
-          ).select("-password");
-    
-        
-        const success = {
-            msg: "Package with id " + id + " has been updated",
-            package: package
-        };
-
-        res.status(200).json({
-            success,
+          ],
         });
+      }
+
+      let updateQuery = {};
+
+      if (name) updateQuery.name = name;
+      if (description) updateQuery.description = description;
+      if (profitRate) updateQuery.profitRate = profitRate;
+      if (price) updateQuery.price = price;
+
+      const profitRange = package.profitRange || {};
+
+      if (profitRangeStart) profitRange.start = profitRangeStart;
+      if (profitRangeEnd) profitRange.end = profitRangeEnd;
+
+      updateQuery.profitRange = profitRange;
+
+      package = await Package.findOneAndUpdate(
+        {
+          _id: id,
+        },
+        updateQuery,
+        {
+          new: true,
+        }
+      ).select("-password");
+
+      const success = {
+        msg: "Package with id " + id + " has been updated",
+        package: package,
+      };
+
+      res.status(200).json({
+        success,
+      });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({
-            errors: [
-            {
-                code: 500,
-                msg: err.toString(),
-            },
+      console.error(err.message);
+      res.status(500).json({
+        errors: [
+          {
+            code: 500,
+            msg: err.toString(),
+          },
         ],
       });
     }
@@ -153,26 +166,25 @@ module.exports = {
 
   async getPackage(req, res) {
     try {
-        let package = await Package.find({});
+      let package = await Package.find({});
 
-        const success = {
-            packages: package
-        };
+      const success = {
+        packages: package,
+      };
 
-        res.status(200).json({
-            success,
-        });
+      res.status(200).json({
+        success,
+      });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({
-            errors: [
-            {
-                code: 500,
-                msg: err.toString(),
-            },
+      console.error(err.message);
+      res.status(500).json({
+        errors: [
+          {
+            code: 500,
+            msg: err.toString(),
+          },
         ],
       });
     }
-  }
-  
+  },
 };

@@ -1,13 +1,11 @@
-const { body, param, oneOf, check} = require("express-validator");
+const { body, param, oneOf, check } = require("express-validator");
 const errorHandler = require("./errorHandler");
 const config = require("../config");
-
 
 const idRegex = new RegExp(`^[0-9A-Fa-f]{${config.DB_ID_LENGTH}}$`);
 
 module.exports = {
-    validateRegistration: () => [
-    
+  validateRegistration: () => [
     body("username")
       .exists()
       .withMessage("Username is required")
@@ -27,16 +25,16 @@ module.exports = {
       .withMessage(
         "Password should contain at least one letter, one number and one special character"
       ),
-    
+
     errorHandler,
   ],
 
   validateLogin: () => [
     check("username")
-        .exists()
-        .withMessage("Username is required")
-        .matches(/^[a-z0-9_.]{3,25}$/)
-        .withMessage("Please provide a avalid username"),
+      .exists()
+      .withMessage("Username is required")
+      .matches(/^[a-z0-9_.]{3,25}$/)
+      .withMessage("Please provide a avalid username"),
 
     check("password", "Password is required").exists(),
 
@@ -76,7 +74,6 @@ module.exports = {
   ],
 
   validateUpdate: () => [
-    
     body("userId")
       .exists()
       .withMessage("UserId is required")
@@ -94,19 +91,21 @@ module.exports = {
       .withMessage("Please provide a valid lastName"),
 
     body("referralCode")
-      .optional()  
+      .optional()
       .matches(/^[a-zA-Z0-9]{6}$/)
       .withMessage("Please provide a valid referral code"),
-    
+
     body("packageStatus")
-    .optional()
-    .matches(/Pending|Approved|Denied/)
-    .withMessage("Please provide a valid package status : Pending or Approved or Denied "),
+      .optional()
+      .matches(/Pending|Approved|Denied/)
+      .withMessage(
+        "Please provide a valid package status : Pending or Approved or Denied "
+      ),
 
     body("verified")
-    .optional()
-    .matches(/true/)
-    .withMessage("Verification can only be true."),
+      .optional()
+      .matches(/true/)
+      .withMessage("Verification can only be true."),
 
     body("referredFrom")
       .optional()
@@ -123,80 +122,101 @@ module.exports = {
 
   createPackage: () => [
     check("name")
-        .exists()
-        .withMessage("Package name is required")
-        .matches(/^[a-zA-Z0-9_.]{3,25}$/)
-        .withMessage("Please provide a valid package name")
-        .bail(),
-      
-      check("price")
-        .exists()
-        .withMessage("Price is required")
-        .matches(/^[0-9., -]{1,25}$/)
-        .withMessage("Please provide valid price ")
-        .bail(),
+      .exists()
+      .withMessage("Package name is required")
+      .matches(/^[a-zA-Z0-9_.]{3,25}$/)
+      .withMessage("Please provide a valid package name")
+      .bail(),
 
-      check("profitRate")
-        .exists()
-        .withMessage("rate is required")
-        .matches(/^[0-9.]{1,25}$/)
-        .withMessage("Please provide valid rate ")
-        .bail(),
+    check("price")
+      .exists()
+      .withMessage("Price is required")
+      .matches(/^[0-9., -]{1,25}$/)
+      .withMessage("Please provide valid price ")
+      .bail(),
+
+    check("profitRate")
+      .exists()
+      .withMessage("rate is required")
+      .matches(/^[0-9.]{1,25}$/)
+      .withMessage("Please provide valid rate ")
+      .bail(),
+
+    check("profitRangeStart")
+      .exists()
+      .withMessage("rate is required")
+      .matches(/^[0-9.]{1,25}$/)
+      .withMessage("Please provide valid rate ")
+      .bail(),
+
+    check("profitRangeEnd")
+      .exists()
+      .withMessage("rate is required")
+      .matches(/^[0-9.]{1,25}$/)
+      .withMessage("Please provide valid rate ")
+      .bail(),
 
     errorHandler,
   ],
   deletePackage: () => [
     check("packageId")
-        .exists()
-        .withMessage("packageId is required")
-        .matches(idRegex)
-        .withMessage("Please provide a valid package id"),
-
+      .exists()
+      .withMessage("packageId is required")
+      .matches(idRegex)
+      .withMessage("Please provide a valid package id"),
 
     errorHandler,
   ],
   getUser: () => [
     param("userId")
-        .exists()
-        .withMessage("userId is required")
-        .matches(idRegex)
-        .withMessage("Please provide a valid user id"),
-
+      .exists()
+      .withMessage("userId is required")
+      .matches(idRegex)
+      .withMessage("Please provide a valid user id"),
 
     errorHandler,
   ],
   getTransactionHistory: () => [
     param("walletId")
-        .exists()
-        .withMessage("walletId is required")
-        .matches(idRegex)
-        .withMessage("Please provide a valid wallet id"),
-
+      .exists()
+      .withMessage("walletId is required")
+      .matches(idRegex)
+      .withMessage("Please provide a valid wallet id"),
 
     errorHandler,
   ],
 
   updatePackage: () => [
     check("name")
-        .optional()
-        .matches(/^[a-z0-9_.]{3,25}$/)
-        .withMessage("Please provide a valid package name")
-        .bail(),
-      
-      check("price")
-        .optional()
-        .matches(/^[0-9., -]{1,25}$/)
-        .withMessage("Please provide valid price ")
-        .bail(),
-      
-      check("profitRate")
-        .optional()
-        .matches(/^[0-9.]{1,25}$/)
-        .withMessage("Please provide valid rate ")
-        .bail(),
+      .optional()
+      .matches(/^[a-z0-9_.]{3,25}$/)
+      .withMessage("Please provide a valid package name")
+      .bail(),
 
+    check("price")
+      .optional()
+      .matches(/^[0-9., -]{1,25}$/)
+      .withMessage("Please provide valid price ")
+      .bail(),
+
+    check("profitRate")
+      .optional()
+      .matches(/^[0-9.]{1,25}$/)
+      .withMessage("Please provide valid rate ")
+      .bail(),
+
+    check("profitRangeStart")
+      .optional()
+      .matches(/^[0-9.]{1,25}$/)
+      .withMessage("Please provide valid rate ")
+      .bail(),
+
+    check("profitRangeEnd")
+      .optional()
+      .matches(/^[0-9.]{1,25}$/)
+      .withMessage("Please provide valid rate ")
+      .bail(),
 
     errorHandler,
   ],
-  
 };
