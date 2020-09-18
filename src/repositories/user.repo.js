@@ -184,7 +184,10 @@ module.exports = {
       // See if user exists
       const user = await User.findOne({
         email,
-      });
+      })
+        .populate("wallet")
+        .populate("profilePhoto")
+        .populate("package");
 
       if (!user) {
         return res.status(401).json({
@@ -243,7 +246,6 @@ module.exports = {
           }
 
           const userObject = user.toObject();
-
           delete userObject["password"];
 
           const success = {
@@ -273,8 +275,9 @@ module.exports = {
 
       let user = await User.findOne({
         _id: id,
-      }).populate("package")
-      .populate("wallet");
+      })
+        .populate("package")
+        .populate("wallet");
 
       if (!user) {
         return res.status(400).json({
@@ -365,7 +368,7 @@ module.exports = {
     const { _id, package } = req.body;
     try {
       let packages = await Package.findOne({
-        name: package,
+        _id,
       });
 
       if (!packages) {
@@ -484,25 +487,25 @@ module.exports = {
 
   async getPackage(req, res) {
     try {
-        let package = await Package.find({});
+      let package = await Package.find({});
 
-        const success = {
-            packages: package
-        };
+      const success = {
+        packages: package,
+      };
 
-        res.status(200).json({
-            success,
-        });
+      res.status(200).json({
+        success,
+      });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({
-            errors: [
-            {
-                code: 500,
-                msg: err.toString(),
-            },
+      console.error(err.message);
+      res.status(500).json({
+        errors: [
+          {
+            code: 500,
+            msg: err.toString(),
+          },
         ],
       });
     }
-  }
+  },
 };
