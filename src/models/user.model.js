@@ -18,6 +18,11 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        phoneCode: {
+            type: String,
+            required: false,
+            default: null,
+        },
         phone: {
             type: String,
             required: true,
@@ -69,6 +74,16 @@ const userSchema = new mongoose.Schema(
             required: false,
             default: null,
         },
+        fathersName: {
+            type: String,
+            required: false,
+            default: null,
+        },
+        address: {
+            type: String,
+            required: false,
+            default: null,
+        },
         type: {
             seller: {
                 type: Boolean,
@@ -91,38 +106,35 @@ const userSchema = new mongoose.Schema(
                 default: false,
             },
         },
-        accountInfo:{
-            accountHolderName:{
+        accountInfo: {
+            accountHolderName: {
                 type: String,
                 required: false,
                 default: null,
             },
-            fathersName:{
+            accountNumber: {
                 type: String,
                 required: false,
                 default: null,
             },
-            accountNumber:{
+            bankName: {
                 type: String,
                 required: false,
                 default: null,
             },
-            bankName:{
+            nicNumber: {
                 type: String,
                 required: false,
                 default: null,
             },
-            nicNumber:{
-                type: String,
-                required: false,
-                default: null,
-            },
-            nicImages:[{
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Media',
-                required: false,
-            }]
-        }
+            nicImages: [
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'Media',
+                    required: false,
+                },
+            ],
+        },
     },
     {
         timestamps: true,

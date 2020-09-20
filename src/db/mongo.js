@@ -6,10 +6,6 @@ mongoose
         useUnifiedTopology: true,
         useFindAndModify: false,
         useCreateIndex: true,
-        autoReconnect:true,
-        reconnectInterval: 10000,
-        reconnectTries: Number.MAX_VALUE,
-        bufferMaxEntries: 0
     })
     .then(() => {
         console.log('connected to db');
@@ -17,7 +13,5 @@ mongoose
     .catch((err) => {
         console.log(err);
     });
-
-
 
 module.exports = mongoose.Connection;

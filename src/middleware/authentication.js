@@ -71,7 +71,7 @@ module.exports = {
                 });
             }
         } catch (err) {
-            console.log(err);
+            console.log(err.toString());
             res.status(401).json({
                 msg: 'Token is not valid',
             });

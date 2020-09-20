@@ -35,7 +35,7 @@ router.use(authMiddleware.userAuth);
 router.get('/', UserRepo.getProfile);
 
 router.put('/', userValidators.validateUpdate(), UserRepo.updateProfile);
-router.put('/updateAccountInfo', userValidators.validateAccountInfoUpdate(), UserRepo.updateAccountInfo);
+// router.put('/updateAccountInfo', userValidators.validateAccountInfoUpdate(), UserRepo.updateAccountInfo);
 router.post(
     '/uploadNIC',
     [getMulterMiddleware('nicImages', 'public/media/nic/', false, 2), handleMulterError],

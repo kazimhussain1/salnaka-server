@@ -59,7 +59,7 @@ module.exports = {
     },
 
     async createUser(req, res) {
-        const { firstName, lastName, email, password, phone, refCode } = req.body;
+        const { firstName, lastName, email, password, phoneCode, phone, refCode } = req.body;
 
         try {
             // See if user exists
@@ -100,6 +100,7 @@ module.exports = {
                 lastName,
                 email,
                 password,
+                phoneCode,
                 phone,
                 wallet: new_wallet._id,
                 referralCode: ref_code,
@@ -119,11 +120,7 @@ module.exports = {
             const salt = await bcrypt.genSalt(10);
             user.password = await bcrypt.hash(password, salt);
 
-            await user.save();
-
             new_wallet.user = user._id;
-
-            await new_wallet.save();
 
             // Verification Token
             let emailVerificationToken = new EmailVerification({
@@ -158,6 +155,9 @@ module.exports = {
 
             await transporter.sendMail(mailOptions);
 
+            await user.save();
+            await new_wallet.save();
+
             res.status(201).json({
                 success: {
                     msg: 'A verification link has been sent to your email. Please verify your account and sign in.',
@@ -181,6 +181,7 @@ module.exports = {
 
         try {
             // See if user exists
+            console.log('in login');
             const user = await User.findOne({
                 email,
             })
@@ -276,7 +277,8 @@ module.exports = {
                 _id: id,
             })
                 .populate('package')
-                .populate('wallet');
+                .populate('wallet')
+                .populate('accountInfo.nicImages')
 
             if (!user) {
                 return res.status(400).json({
@@ -315,13 +317,36 @@ module.exports = {
         try {
             const id = req.user.id;
 
-            const { firstName, lastName, phone } = req.body;
+            const {
+                firstName,
+                lastName,
+                phone,
+                phoneCode,
+                address,
+                fathersName,
+                accountHolderName,
+                accountNumber,
+                bankName,
+                nicNumber,
+            } = req.body;
 
             let updateQuery = {};
 
             if (firstName) updateQuery.firstName = firstName;
             if (lastName) updateQuery.lastName = lastName;
             if (phone) updateQuery.phone = phone;
+            if (phoneCode) updateQuery.phoneCode = phoneCode;
+            if (fathersName) updateQuery.fathersName = fathersName;
+            if (address) updateQuery.address = address;
+
+            const accountInfo = req.user.accountInfo || {};
+
+            if (accountHolderName) accountInfo.accountHolderName = accountHolderName;
+            if (accountNumber) accountInfo.accountNumber = accountNumber;
+            if (bankName) accountInfo.bankName = bankName;
+            if (nicNumber) accountInfo.nicNumber = nicNumber;
+
+            updateQuery.accountInfo = accountInfo;
 
             // if (req.fileRelativeUrl) updateQuery.profilePhoto.url = req.fileRelativeUrl; //issue
 
@@ -333,7 +358,7 @@ module.exports = {
                 {
                     new: true,
                 },
-            ).select('-password');
+            ).populate('accountInfo.nicImages').select('-password');
 
             const success = {
                 user: user,
@@ -357,7 +382,7 @@ module.exports = {
 
     async updateAccountInfo(req, res) {
         try {
-            const { accountHolderName, fathersName, accountNumber, bankName, nicNumber } = req.body;
+            const {} = req.body;
 
             req.user.accountInfo = {
                 accountHolderName,
@@ -410,7 +435,7 @@ module.exports = {
                 }
                 //get ids of media object
                 req.user.accountInfo.nicImages = media.map((image) => image._id);
-                req.user.save();
+                await req.user.save();
 
                 //convert relative url to absolute url
                 media.forEach((image) => (image.url = process.env.HOST_NAME + image.url));

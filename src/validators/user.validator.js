@@ -108,6 +108,43 @@ module.exports = {
 
         body('phone').optional().isNumeric().withMessage('Phone number is required'),
 
+        body('accountHolderName')
+            .exists()
+            .withMessage('accountHolderName is required')
+            .bail()
+            .isString()
+            .withMessage('Please provide a valid accountHolderName'),
+
+        body('fathersName')
+            .exists()
+            .withMessage('fathersName is required')
+            .bail()
+            .isString()
+            .withMessage('Please provide a valid fathersName'),
+
+        body('accountNumber')
+            .exists()
+            .withMessage('accountNumber is required')
+            .bail()
+            .isString()
+            .matches(/^[0-9]*$/)
+            .withMessage('Please provide a valid accountNumber'),
+
+        body('bankName')
+            .exists()
+            .withMessage('bankName is required')
+            .bail()
+            .isString()
+            .withMessage('Please provide a valid bankName'),
+
+        body('nicNumber')
+            .exists()
+            .withMessage('nicNumber is required')
+            .bail()
+            .isString()
+            .matches(/^[0-9]*$/)
+            .withMessage('Please provide a valid nicNumber'),
+
         errorHandler,
     ],
 
