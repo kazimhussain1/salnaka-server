@@ -7,7 +7,6 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const referralCodeGenerator = require('referral-code-generator');
-const { IncomingForm } = require('formidable');
 const { existsSync, mkdirSync, unlink } = require('fs');
 const { sign } = require('jsonwebtoken');
 const { TOKEN_EXPIRATION_TIME } = require('../config');
