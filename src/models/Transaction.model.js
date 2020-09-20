@@ -1,35 +1,44 @@
 const mongoose = require('mongoose');
 
 const transaction_historySchema = mongoose.Schema(
-    {   
-        user_id:{
+    {
+        user: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: true
+            ref: 'User',
+            required: true,
         },
-        wallet_id: {
+        wallet: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Wallet",
-            required: true
-            },
-        amount:{
+            ref: 'Wallet',
+            required: true,
+        },
+        amount: {
             type: Number,
-            required: true
+            required: true,
         },
-        date:{
-            type: Date,
-            required: true
-        },
-       
-        action:{ //whether incoming or outgoing
+        description: {
             type: String,
             required: true,
         },
-        description:{
+        action: {
+            //whether incoming or outgoing
             type: String,
-            required: true
-        }
+            required: true,
+        },
+        status: {
+            //Approved, Pending or Denied
+            type: String,
+            required: true,
+        },
+        date: {
+            type: Date,
+            required: true,
+        },
+    },
+    {
+        timestamps: true,
+        versionKey: false,
+    },
+);
 
-});
-
-module.exports = mongoose.model("Transaction_History", transaction_historySchema);
+module.exports = mongoose.model('Transaction_History', transaction_historySchema);

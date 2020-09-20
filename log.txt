@@ -1,0 +1,6 @@
+2020-09-20T07:52:20.685Z:
+Error: ENOENT: no such file or directory, unlink 'D:\Professional Projects\salnaka-server\public\media\nic\undefined.jpeg'
+
+2020-09-20T07:57:02.634Z:
+Error: ENOENT: no such file or directory, unlink 'D:\Professional Projects\salnaka-server\public\media\nic\undefined.jpeg'
+

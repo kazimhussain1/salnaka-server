@@ -1,4 +1,4 @@
-const {IMAGE_SIZE_LIMIT, VIDEO_SIZE_LIMIT} = require('./config')
+const { IMAGE_SIZE_LIMIT, VIDEO_SIZE_LIMIT } = require('./config');
 
 const errorConstants = {
     ERR_NOT_AUTHORIZED: {
@@ -19,24 +19,28 @@ const errorConstants = {
     },
     ERR_IMAGE_SIZE_EXCEEDED: {
         errorCode: 422,
-        error: `Image upload size exceeded. Maximum upload size is ${Math.round(IMAGE_SIZE_LIMIT/1024/1024)} MB per Image.`,
+        error: `Image upload size exceeded. Maximum upload size is ${Math.round(
+            IMAGE_SIZE_LIMIT / 1024 / 1024,
+        )} MB per Image.`,
     },
     ERR_VIDEO_SIZE_EXCEEDED: {
         errorCode: 422,
-        error: `Video upload size exceeded. Maximum upload size is ${Math.round(VIDEO_SIZE_LIMIT/1024/1024)} MB per Video.`,
+        error: `Video upload size exceeded. Maximum upload size is ${Math.round(
+            VIDEO_SIZE_LIMIT / 1024 / 1024,
+        )} MB per Video.`,
     },
     ERR_MEDIA_TYPE_NOT_ALLOWED: {
         errorCode: 422,
         error: 'Media Type not supported in this request',
     },
-}
+};
 
 const transactionConstants = {
-    INCOMING : "Incoming",
-    OUTGOING : "Outgoing"
-}
+    INCOMING: 'Cash-in',
+    OUTGOING: 'Cash-out',
+};
 
 module.exports = {
     errorConstants,
-    transactionConstants
-}
+    transactionConstants,
+};

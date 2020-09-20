@@ -2,27 +2,28 @@ const mongoose = require('mongoose');
 
 const mediaSchema = mongoose.Schema(
     {
-        mimeType:{
+        name: {
             type: String,
-            required: true
+            required: true,
         },
-        name:{
+        mimeType: {
             type: String,
-            required: true
+            required: true,
         },
-        url:{
+        
+        url: {
             type: String,
-            required: true
+            required: true,
         },
-        size:{
+        size: {
             type: String,
-            required: true
+            required: true,
         },
-        dimension:{
-            type: String,
-            required: true
-        },
-    }
+    },
+    {
+        timestamps: true,
+        versionKey: false,
+    },
 );
 
-module.exports = mongoose.model("Media", mediaSchema);
+module.exports = mongoose.model('Media', mediaSchema);

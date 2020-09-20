@@ -219,4 +219,23 @@ module.exports = {
 
     errorHandler,
   ],
+
+  validateTransactionStatusUpdate: () => [
+    body("transactionId")
+      .exists()
+      .withMessage("transactionId is required")
+      .bail()
+      .matches(idRegex)
+      .withMessage("Please provide a valid transactionId")
+      .bail(),
+
+      body("transactionStatus")
+      .exists()
+      .withMessage("transactionStatus is required")
+      .bail()
+      .matches(/Pending|Approved|Denied/)
+      .withMessage("Please provide a valid transactionStatus: 'Pending', 'Approved' or 'Denied'"),
+
+    errorHandler,
+  ],
 };
