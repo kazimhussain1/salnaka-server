@@ -278,7 +278,7 @@ module.exports = {
             })
                 .populate('package')
                 .populate('wallet')
-                .populate('accountInfo.nicImages')
+                .populate('accountInfo.nicImages');
 
             if (!user) {
                 return res.status(400).json({
@@ -292,6 +292,8 @@ module.exports = {
 
             const userObject = user.toObject();
             delete userObject['password'];
+
+            userObject.accountInfo.nicImages.forEach((image) => (image.url = process.env.HOST_NAME + image.url));
 
             const success = {
                 user: userObject,
@@ -358,7 +360,9 @@ module.exports = {
                 {
                     new: true,
                 },
-            ).populate('accountInfo.nicImages').select('-password');
+            )
+                .populate('accountInfo.nicImages')
+                .select('-password');
 
             const success = {
                 user: user,
