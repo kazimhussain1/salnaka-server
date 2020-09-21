@@ -66,7 +66,7 @@ module.exports = {
 
             let allTransactions = await Transaction.find({
                 user: user.id,
-            });
+            }).populate({ path: 'user', populate: { path: 'package' } });
 
             if (!allTransactions) {
                 return res.status(400).json({
@@ -99,11 +99,10 @@ module.exports = {
     },
 
     async withdrawAmount(req, res) {
-
         try {
             const { amount } = req.body;
-            const user = req.user
-    
+            const user = req.user;
+
             if (user.wallet.currentAmount < amount) {
                 return res.status(403).json({
                     errors: [
@@ -114,24 +113,24 @@ module.exports = {
                     ],
                 });
             }
-    
-           const transaction = await new Transaction({
-                        user: user._id,
-                        wallet: user.wallet._id,
-                        amount: amount,
-                        date: new Date(),
-                        action: transactionConstants.OUTGOING,
-                        status: 'Pending',
-                        description: `Withdrawal by user`,
-                    });
-                    await transaction.save();
-    
-                    res.status(200).json({
-                        success:{
-                            msg: "Your withdrawal is Pending approval by Admin.",
-                            transaction
-                        }
-                    })
+
+            const transaction = await new Transaction({
+                user: user._id,
+                wallet: user.wallet._id,
+                amount: amount,
+                date: new Date(),
+                action: transactionConstants.OUTGOING,
+                status: 'Pending',
+                description: `Withdrawal by user`,
+            });
+            await transaction.save();
+
+            res.status(200).json({
+                success: {
+                    msg: 'Your withdrawal is Pending approval by Admin.',
+                    transaction,
+                },
+            });
         } catch (err) {
             return res.status(500).json({
                 errors: [
@@ -142,6 +141,5 @@ module.exports = {
                 ],
             });
         }
-       
     },
 };
