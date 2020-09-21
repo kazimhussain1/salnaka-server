@@ -6,7 +6,7 @@ const { transactionConstants } = require('../constants');
 module.exports = {
     async getWallet(req, res) {
         try {
-            const wallets = await Wallet.find({}).populate('user');
+            const wallets = await Wallet.find({}).populate({ path: 'user', populate: { path: 'package' } });
 
             res.status(200).json({
                 success: wallets,
@@ -30,7 +30,7 @@ module.exports = {
 
             let wallet = await Wallet.findOne({
                 _id: id,
-            }).populate('user');
+            }).populate({ path: 'user', populate: { path: 'package' } });
 
             if (!wallet) {
                 return res.status(400).json({
@@ -150,7 +150,7 @@ module.exports = {
             const transactions = await Transaction.find({
                 status: 'Pending',
             })
-                .populate('user')
+                .populate({ path: 'user', populate: { path: 'package' } })
                 .populate('wallet');
 
             res.status(200).json({
