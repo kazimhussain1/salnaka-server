@@ -362,6 +362,8 @@ module.exports = {
                 },
             )
                 .populate('accountInfo.nicImages')
+                .populate('wallet')
+                .populate('package')
                 .select('-password');
 
             const success = {
