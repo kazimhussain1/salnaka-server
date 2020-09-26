@@ -249,6 +249,8 @@ module.exports = {
                     const userObject = user.toObject();
                     delete userObject['password'];
 
+                    userObject.accountInfo.nicImages.forEach((image) => (image.url = process.env.HOST_NAME + image.url));
+
                     const success = {
                         token,
                         user: userObject,
@@ -366,6 +368,8 @@ module.exports = {
                 .populate('wallet')
                 .populate('package')
                 .select('-password');
+
+            user.accountInfo.nicImages.forEach((image) => (image.url = process.env.HOST_NAME + image.url));
 
             const success = {
                 user: user,
