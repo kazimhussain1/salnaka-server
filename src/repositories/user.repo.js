@@ -187,7 +187,8 @@ module.exports = {
             })
                 .populate('wallet')
                 .populate('profilePhoto')
-                .populate('package');
+                .populate('package')
+                .populate('accountInfo.nicImages');
 
             if (!user) {
                 return res.status(401).json({
