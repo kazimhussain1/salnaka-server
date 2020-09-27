@@ -59,8 +59,9 @@ module.exports = {
     },
 
     async createUser(req, res) {
-        const { firstName, lastName, email, password, phoneCode, phone, refCode } = req.body;
+        const { firstName, lastName, password, phoneCode, phone, refCode } = req.body;
 
+        const email = req.body.email.toLowerCase();
         try {
             // See if user exists
             let user = await User.findOne({
