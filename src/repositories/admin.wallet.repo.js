@@ -104,11 +104,11 @@ module.exports = {
                     $exists: true,
                     $ne: null,
                 },
-                // approvalDate: { TODO: uncomment in production
-                //     $exists: true,
-                //     $ne: null,
-                //     $lt: date,
-                // },
+                approvalDate: { 
+                    $exists: true,
+                    $ne: null,
+                    $lt: date,
+                },
             })
                 .populate('package')
                 .populate('wallet');
